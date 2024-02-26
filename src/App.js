@@ -30,6 +30,8 @@ function Board({ xIsNext, squares, onPlay }) {
   let status;
   if (winningLine) {
     status = 'Winner: ' + (xIsNext ? 'O' : 'X');
+  } else if (squares.filter((value) => value === null).length === 0) {
+    status = 'Draw';
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
