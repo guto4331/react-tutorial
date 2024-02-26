@@ -23,7 +23,7 @@ function Board({ xIsNext, squares, onPlay }) {
     } else {
       nextSquares[i] = 'O';
     }
-    onPlay(nextSquares);
+    onPlay(nextSquares, i);
   }
   
   const winningLine = calculateWinningLine(squares);
@@ -59,13 +59,16 @@ export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [doReverseMoves, setDoReverseMoves] = useState(false);
+  const [indexHistory, setIndexHistory] = useState([null]);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
   
-  function handlePlay(nextSquares) {
+  function handlePlay(nextSquares, i) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    const nextIndexHistory = [...indexHistory.slice(0, currentMove + 1), i];
+    setIndexHistory(nextIndexHistory);
   }
   
   function jumpTo(nextMove) {
@@ -91,13 +94,17 @@ export default function Game() {
     }
     
     return (
-      move === currentMove
-        ? <li key={move}>
-            {description}
-          </li>
-        : <li key={move}>
-            <button onClick={() => jumpTo(move)}>{description}</button>
-          </li>
+      <li key={move}>
+        {
+          move === currentMove
+            ? description
+            : <button onClick={() => jumpTo(move)}>{description}</button>
+        }{
+          move === 0
+          ? null
+          : ` - [(row, col) = (${Math.floor(indexHistory[move] / 3) + 1}, ${indexHistory[move] % 3 + 1})]`
+        }
+      </li>
     );
   });
   
