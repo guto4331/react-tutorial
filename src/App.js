@@ -51,6 +51,7 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+  const [doReverseMoves, setDoReverseMoves] = useState(false);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
   
@@ -64,7 +65,15 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
   
+  function reverseOrder() {
+    setDoReverseMoves(!doReverseMoves);
+  }
+  
   const moves = history.map((squares, move) => {
+    if (doReverseMoves) {
+      move = history.length - 1 - move;
+    }
+    
     let description;
     if (move === currentMove) {
       description = `You are at move #${move}`
@@ -91,6 +100,7 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
         <div className="game-info">
+          <button onClick={reverseOrder}>Reverse order</button>
           <ol>{moves}</ol>
         </div>
     </div>
