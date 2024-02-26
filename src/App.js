@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isWinningSquare }) {
   return (
     <button
       className="square"
       onClick={onSquareClick}
+      style={{ backgroundColor: isWinningSquare ? 'yellow' : null }}
     >
       {value}
     </button>
@@ -13,7 +14,7 @@ function Square({ value, onSquareClick }) {
 
 function Board({ xIsNext, squares, onPlay }) {
   function handleClick(i){
-    if (squares[i] || calculateWinner(squares)){
+    if (squares[i] || calculateWinningLine(squares)){
       return;
     }
     const nextSquares = squares.slice();
@@ -25,10 +26,10 @@ function Board({ xIsNext, squares, onPlay }) {
     onPlay(nextSquares);
   }
   
-  const winner = calculateWinner(squares);
+  const winningLine = calculateWinningLine(squares);
   let status;
-  if (winner) {
-    status = 'Winner: ' + winner;
+  if (winningLine) {
+    status = 'Winner: ' + (xIsNext ? 'O' : 'X');
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
@@ -40,7 +41,11 @@ function Board({ xIsNext, squares, onPlay }) {
       {[0, 1, 2].map((i) => 
         <div className="board-row">
         {[0, 1, 2].map((j) => 
-          <Square value={squares[3 * i + j]} onSquareClick={() => handleClick(3 * i + j)} />
+          <Square
+            value={squares[3 * i + j]}
+            onSquareClick={() => handleClick(3 * i + j)}
+            isWinningSquare={winningLine && winningLine.includes(3 * i + j)}
+          />
         )}
         </div>
       )}
@@ -108,7 +113,7 @@ export default function Game() {
 
 }
 
-function calculateWinner(squares) {
+function calculateWinningLine(squares) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -122,7 +127,7 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return lines[i];
     }
   }
   return null;
